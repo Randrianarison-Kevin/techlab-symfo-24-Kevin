@@ -4,6 +4,10 @@
 
 {% block body %}
 <a href="{{ path('app_logout') }}">Logout</a>
+<div {{ react_component('Hello', { fullName: 'Fabien' }) }}>
+        Loading... <i class="fas fa-cog fa-spin fa-3x"></i>
+</div>
+
 <script>
     const eventSource = new EventSource("{{ mercure('https://example.com/books/1')|escape('js') }}");
     eventSource.onmessage = event => {
