@@ -7,7 +7,7 @@
 {% if conversation is empty %}
     <p>Aucune conversation trouvée. Démarrez une nouvelle conversation.</p>
 {% else %}
-    <ul>
+    <ul id="message-list">
         {% for message in conversation %}
             <li>
                 <strong>{{ message.user.username }}</strong>: {{ message.content }} <em>({{ message.createdAt|date('d/m/Y H:i') }})</em>
@@ -19,4 +19,23 @@
     <textarea name="message" required></textarea>
     <button type="submit">Envoyer</button>
 </form>
+
+<script>
+const eventSource = new EventSource("{{ mercure('https://example.com/chat/' ~ user.id)|escape('js') }}");
+eventSource.onmessage = event => {
+    // Will be called every time an update is published by the server
+    const data = JSON.parse(event.data);
+    console.log('Event received:', data);
+
+    // Mettre à jour l'interface utilisateur avec le nouveau message
+    const messageList = document.getElementById('message-list');
+    if (messageList) {
+        const newMessage = document.createElement('li');
+        newMessage.innerHTML = `<strong>${data.sender}</strong>: ${data.message}`;
+        messageList.appendChild(newMessage);
+    } else {
+        console.error('Element with id "message-list" not found');
+    }
+};
+</script>
 {% endblock %}
