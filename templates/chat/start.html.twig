@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chat{% endblock %}
+
+{% block body %}
+    <a href="{{ path('app_logout') }}">Logout</a>
+    <h1>Tous les utilisateurs</h1>
+
+
+    {% for user in allUser %}
+        <div>{{user.username}}</div>
+    {% endfor %}    
+{% endblock %}
