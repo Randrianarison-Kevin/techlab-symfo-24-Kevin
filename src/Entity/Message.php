@@ -23,6 +23,9 @@ class Message
     #[ORM\ManyToOne(inversedBy: 'messages')]
     private ?User $user = null;
 
+    #[ORM\ManyToOne(inversedBy: 'receivedMessages')]
+    private ?User $receiver = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +63,18 @@ class Message
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getReceiver(): ?User
+    {
+        return $this->receiver;
+    }
+
+    public function setReceiver(?User $receiver): static
+    {
+        $this->receiver = $receiver;
 
         return $this;
     }

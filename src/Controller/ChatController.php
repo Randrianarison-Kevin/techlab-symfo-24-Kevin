@@ -40,7 +40,7 @@ class ChatController extends AbstractController
     {
         $currentUser = $this -> getUser();
         $conversation = $messageRepository->createQueryBuilder('m') 
-            ->where('m.user = :user OR m.user = :currentUser') 
+            ->where('(m.user = :user AND m.receiver = :currentUser) OR (m.user = :currentUser AND m.receiver = :user)') 
             ->setParameter('user', $user) 
             ->setParameter('currentUser', $currentUser) 
             ->orderBy('m.createdAt', 'ASC') 
@@ -54,6 +54,7 @@ class ChatController extends AbstractController
                 $message -> setContent($content);
                 $message -> setCreatedAt(new \DateTimeImmutable());
                 $message -> setUser($currentUser);
+                $message -> setReceiver($user);
                 $entityManagerInterface -> persist($message);
                 $entityManagerInterface -> flush();
 
