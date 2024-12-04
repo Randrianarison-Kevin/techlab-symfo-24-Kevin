@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Conversation avec {{ user.username }}{% endblock %}
+
+{% block body %}
+<h1>Conversation avec {{ user.username }}</h1>
+{% if conversation is empty %}
+    <p>Aucune conversation trouvée. Démarrez une nouvelle conversation.</p>
+{% else %}
+    <ul>
+        {% for message in conversation %}
+            <li>
+                <strong>{{ message.user.username }}</strong>: {{ message.content }} <em>({{ message.createdAt|date('d/m/Y H:i') }})</em>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<form method="post" action="{{ path('app_chat', {id: user.id}) }}">
+    <textarea name="message" required></textarea>
+    <button type="submit">Envoyer</button>
+</form>
+{% endblock %}

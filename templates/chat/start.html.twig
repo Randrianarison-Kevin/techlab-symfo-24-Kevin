@@ -8,6 +8,6 @@
 
 
     {% for user in allUser %}
-        <div>{{user.username}}</div>
+        <a href="{{ path('app_chat', {id: user.id})}}">{{user.username}}</a>
     {% endfor %}    
 {% endblock %}
