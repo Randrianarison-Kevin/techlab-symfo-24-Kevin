@@ -2,36 +2,105 @@
 
 {% block title %}Conversation avec {{ user.username }}{% endblock %}
 
+{% block stylesheets %}
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .conversation-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        .conversation-container h1 {
+            font-size: 24px;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        .message-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .message-list li {
+            background-color: #f1f1f1;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            position: relative;
+        }
+        .message-list strong {
+            color: #007bff;
+        }
+        .message-time {
+            float: right;
+            margin-left: 10px;
+            color: #888888;
+        }
+        form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            color: #ffffff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-<h1>Conversation avec {{ user.username }}</h1>
-{% if conversation is empty %}
-    <p>Aucune conversation trouvée. Démarrez une nouvelle conversation.</p>
-{% else %}
-    <ul id="message-list">
-        {% for message in conversation %}
-            <li>
-                <strong>{{ message.user.username }}</strong>: {{ message.content }} <em>({{ message.createdAt|date('d/m/Y H:i') }})</em>
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
-<form method="post" action="{{ path('app_chat', {id: user.id}) }}">
-    <textarea name="message" required></textarea>
-    <button type="submit">Envoyer</button>
-</form>
+<div class="conversation-container">
+    <h1>Conversation avec {{ user.username }}</h1>
+    {% if conversation is empty %}
+        <p>Aucune conversation trouvée. Démarrez une nouvelle conversation.</p>
+    {% else %}
+        <ul id="message-list" class="message-list">
+            {% for message in conversation %}
+                <li>
+                    <strong>{{ message.user.username }}</strong>: {{ message.content }} 
+                    <span class="message-time">{{ message.createdAt|date('d/m/Y H:i') }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form method="post" action="{{ path('app_chat', {id: user.id}) }}">
+        <textarea name="message" required></textarea>
+        <button type="submit">Envoyer</button>
+    </form>
+</div>
 
 <script>
 const eventSource = new EventSource("{{ mercure('https://example.com/chat/' ~ user.id)|escape('js') }}");
 eventSource.onmessage = event => {
-    // Will be called every time an update is published by the server
     const data = JSON.parse(event.data);
     console.log('Event received:', data);
 
-    // Mettre à jour l'interface utilisateur avec le nouveau message
     const messageList = document.getElementById('message-list');
     if (messageList) {
         const newMessage = document.createElement('li');
-        newMessage.innerHTML = `<strong>${data.sender}</strong>: ${data.message}`;
+        newMessage.innerHTML = `<strong>${data.sender}</strong>: ${data.message} <span class="message-time">(${new Date().toLocaleString()})</span>`;
         messageList.appendChild(newMessage);
     } else {
         console.error('Element with id "message-list" not found');
